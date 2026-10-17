@@ -6,7 +6,10 @@ import { fileURLToPath } from "node:url";
 const ROOT = resolve(fileURLToPath(new URL(".", import.meta.url)));
 // `Number(...) || 4173` also handles an inherited PORT=0 or non-numeric value.
 const PORT = Number(process.env.PORT) || 4173;
-const HOST = process.env.HOST || "127.0.0.1";
+// When a platform (Render, a container host) injects PORT it also expects the
+// server to listen on every interface; locally we keep it on loopback unless
+// HOST is set explicitly.
+const HOST = process.env.HOST || (process.env.PORT ? "0.0.0.0" : "127.0.0.1");
 
 const MIME = {
   ".html": "text/html; charset=utf-8",
@@ -39,6 +42,18 @@ const server = createServer((req, res) => {
   }
 
   if (pathname === "/") pathname = "/index.html";
+
+  // Health probe for the hosting platform's uptime check.
+  if (pathname === "/healthz") {
+    res.writeHead(200, {
+      "Content-Type": "application/json; charset=utf-8",
+      "Cache-Control": "no-store",
+    });
+    res.end(
+      JSON.stringify({ ok: true, service: "afterbuy", uptime: process.uptime() }),
+    );
+    return;
+  }
 
   // Resolve inside ROOT only. Dotfiles and source-control folders stay private.
   const filePath = normalize(join(ROOT, pathname));

@@ -34,6 +34,21 @@ const C = {
   leafPale: hex("#a8c9a0"),
   coral: hex("#ef7c6a"),
   coralDark: hex("#cf5f50"),
+  woodMid: hex("#b8845a"),
+  woodLight: hex("#d8a978"),
+  inkBrown: hex("#5b4633"),
+  sage: hex("#afc2a2"),
+  sageLight: hex("#c8d6ba"),
+  paper: hex("#fff9f0"),
+  mustard: hex("#e5bb62"),
+  mustardDeep: hex("#c99b41"),
+  terracotta: hex("#c97f61"),
+  terracottaDeep: hex("#a9614a"),
+  blueDeep: hex("#5f7c8e"),
+  forest: hex("#254d3a"),
+  leafDeep: hex("#4f7554"),
+  forestDeep: hex("#1b3a2b"),
+  paperDeep: hex("#efe3cc"),
   yellow: hex("#f2c861"),
   yellowDark: hex("#d9a93e"),
   blue: hex("#6e93a8"),
@@ -44,6 +59,17 @@ const C = {
   hair: hex("#3a5440"),
   blush: hex("#e9a48f"),
 };
+
+/** Same colour at a different alpha, for soft shading passes. */
+const A = (color, alpha) => [color[0], color[1], color[2], Math.round(alpha * 255)];
+
+/** A one-pixel bevel: light on the top/left, shade on the bottom/right. */
+function bevel(p, x, y, w, h, light = C.paper, dark = C.inkBrown) {
+  p.rect(x + 1, y + 1, w - 2, 1.2, A(light, 0.45));
+  p.rect(x + 1, y + 1, 1.2, h - 2, A(light, 0.3));
+  p.rect(x + 1, y + h - 2.4, w - 2, 1.4, A(dark, 0.22));
+  p.rect(x + w - 2.4, y + 1, 1.4, h - 2, A(dark, 0.16));
+}
 
 class Bitmap {
   constructor(width, height) {
@@ -321,270 +347,454 @@ const artworks = {
   }],
 
   "furniture/bed.png": [128, 104, (p) => {
-    p.rect(5, 8, 118, 92, C.wood);
-    p.strokeRect(5, 8, 118, 92, C.ink, 2);
-    p.rect(5, 4, 118, 16, C.woodDark);
-    p.strokeRect(5, 4, 118, 16, C.ink, 1.6);
-    p.rect(11, 20, 106, 73, C.cream);
-    p.strokeRect(11, 20, 106, 73, C.inkSoft, 1.4);
-    p.rect(11, 50, 106, 43, C.blue);
-    p.strokeRect(11, 50, 106, 43, C.ink, 1.6);
-    p.rect(11, 58, 106, 7, C.coral);
-    p.rect(11, 82, 106, 5, C.blueDark);
-    // Folded leaf-green throw
-    p.rect(74, 68, 38, 20, C.leaf);
-    p.strokeRect(74, 68, 38, 20, C.ink, 1.4);
-    p.line(74, 76, 112, 76, C.leafDark, 1.4);
-    // Pillows
-    p.ellipse(37, 35, 23, 12, C.white);
-    p.ring(37, 35, 23, 12, C.creamDeep, 1.6);
-    p.ellipse(94, 35, 20, 11, C.white);
-    p.ring(94, 35, 20, 11, C.creamDeep, 1.6);
-    p.rect(23, 32, 11, 2, C.creamDeep);
-    p.rect(84, 32, 11, 2, C.creamDeep);
-    p.ellipse(27, 12, 2, 2, C.yellow);
-    p.ellipse(64, 12, 2, 2, C.yellow);
-    p.ellipse(101, 12, 2, 2, C.yellow);
+    // Frame and feet.
+    p.rect(6, 12, 116, 88, C.woodMid);
+    p.rect(6, 88, 116, 10, C.wood);
+    p.strokeRect(5, 11, 118, 90, C.ink, 2);
+    bevel(p, 6, 12, 116, 88, C.paper, C.inkBrown);
+    p.rect(10, 100, 10, 3, C.woodDark);
+    p.rect(108, 100, 10, 3, C.woodDark);
+
+    // Headboard with two panels.
+    p.rect(4, 2, 120, 18, C.woodDark);
+    p.strokeRect(4, 2, 120, 18, C.ink, 2);
+    p.rect(12, 7, 48, 8, C.wood);
+    p.rect(68, 7, 48, 8, C.wood);
+    p.strokeRect(12, 7, 48, 8, A(C.ink, 0.5), 1);
+    p.strokeRect(68, 7, 48, 8, A(C.ink, 0.5), 1);
+    bevel(p, 4, 2, 120, 18, C.cream, C.inkBrown);
+
+    // Mattress and sheet.
+    p.rect(12, 20, 104, 72, C.paper);
+    p.strokeRect(12, 20, 104, 72, A(C.ink, 0.55), 1.4);
+    p.rect(12, 20, 104, 8, C.cream);
+    p.rect(12, 86, 104, 6, C.creamDeep);
+
+    // Duvet: sage, folded back at the top, stitched.
+    p.rect(12, 44, 104, 44, C.sage);
+    p.rect(12, 44, 104, 5, C.sageLight);
+    p.strokeRect(12, 44, 104, 44, A(C.ink, 0.45), 1.4);
+    for (let x = 20; x <= 108; x += 18) {
+      p.line(x, 50, x, 86, A(C.leafDark, 0.35), 0.8);
+    }
+    p.line(12, 60, 116, 60, A(C.leafDark, 0.3), 0.8);
+
+    // Mustard throw folded across the foot.
+    p.rect(70, 68, 46, 20, C.mustard);
+    p.strokeRect(70, 68, 46, 20, A(C.ink, 0.6), 1.3);
+    p.rect(70, 74, 46, 2, C.mustardDeep);
+    p.rect(70, 81, 46, 2, C.mustardDeep);
+    p.rect(70, 68, 46, 2, A(C.paper, 0.5));
+
+    // Pillows.
+    p.ellipse(40, 32, 24, 11, C.paper);
+    p.ring(40, 32, 24, 11, A(C.ink, 0.35), 1.4);
+    p.ellipse(40, 29, 18, 5, A(C.paper, 0.9));
+    p.ellipse(92, 32, 21, 10, C.paper);
+    p.ring(92, 32, 21, 10, A(C.ink, 0.35), 1.4);
+    p.ellipse(92, 29, 15, 4, A(C.paper, 0.9));
+    p.line(28, 36, 52, 36, A(C.inkBrown, 0.25), 1);
   }],
 
   "furniture/desk.png": [144, 64, (p) => {
-    p.rect(12, 46, 10, 16, C.woodDark);
-    p.rect(122, 46, 10, 16, C.woodDark);
-    p.strokeRect(12, 46, 10, 16, C.ink, 1.2);
-    p.strokeRect(122, 46, 10, 16, C.ink, 1.2);
-    p.rect(5, 10, 134, 36, C.wood);
-    p.strokeRect(5, 10, 134, 36, C.ink, 2);
-    p.rect(9, 13, 126, 5, hex("#dcb080"));
-    p.rect(36, 34, 72, 10, C.creamDeep);
-    p.strokeRect(36, 34, 72, 10, C.inkSoft, 1.2);
-    p.ellipse(108, 39, 4, 2.5, C.yellow);
-    // Papers and pencil
-    p.rect(96, 17, 27, 14, C.white);
-    p.strokeRect(96, 17, 27, 14, C.inkSoft, 1);
-    p.line(100, 21, 118, 21, C.inkSoft, 0.8);
-    p.line(100, 25, 114, 25, C.inkSoft, 0.8);
-    p.rect(21, 18, 6, 18, C.coral);
-    p.strokeRect(21, 18, 6, 18, C.ink, 1);
-    p.rect(20, 15, 8, 4, C.cream);
-    p.strokeRect(20, 15, 8, 4, C.ink, 1);
+    // Legs.
+    for (const lx of [12, 124]) {
+      p.rect(lx, 42, 9, 20, C.woodDark);
+      p.strokeRect(lx, 42, 9, 20, A(C.ink, 0.7), 1.1);
+      p.rect(lx + 1, 43, 2, 16, A(C.paper, 0.25));
+    }
+
+    // Top and apron.
+    p.rect(4, 8, 136, 32, C.wood);
+    p.strokeRect(4, 8, 136, 32, C.ink, 1.8);
+    p.rect(4, 8, 136, 4, C.woodLight);
+    p.rect(4, 36, 136, 4, C.woodDark);
+    for (let x = 12; x < 136; x += 22) {
+      p.line(x, 13, x + 14, 13, A(C.woodDark, 0.35), 0.8);
+      p.line(x + 6, 30, x + 22, 30, A(C.woodDark, 0.25), 0.8);
+    }
+
+    // Drawer with a brass pull.
+    p.rect(52, 36, 44, 9, C.woodMid);
+    p.strokeRect(52, 36, 44, 9, A(C.ink, 0.6), 1.1);
+    p.rect(68, 39, 12, 2.2, C.mustardDeep);
+
+    // Notebook.
+    p.rect(84, 14, 34, 17, C.paper);
+    p.strokeRect(84, 14, 34, 17, A(C.ink, 0.55), 1.2);
+    p.rect(84, 14, 4, 17, C.terracotta);
+    for (let i = 0; i < 3; i += 1) {
+      p.line(92, 19 + i * 4, 113, 19 + i * 4, A(C.inkSoft, 0.5), 0.9);
+    }
+
+    // Pencil cup with three pencils.
+    p.rect(20, 18, 12, 18, C.creamDeep);
+    p.strokeRect(20, 18, 12, 18, A(C.ink, 0.65), 1.2);
+    p.rect(20, 33, 12, 3, A(C.inkBrown, 0.18));
+    p.line(23, 18, 21, 8, C.mustard, 1.8);
+    p.line(26, 18, 26, 6, C.leaf, 1.8);
+    p.line(29, 18, 32, 9, C.terracotta, 1.8);
+    p.ellipse(21, 8, 1, 1, C.inkBrown);
+    p.ellipse(26, 6, 1, 1, C.inkBrown);
+    p.ellipse(32, 9, 1, 1, C.inkBrown);
+
+    // Small brass desk lamp.
+    p.ellipse(120, 22, 7, 3, C.mustardDeep);
+    p.line(120, 22, 114, 12, C.mustardDeep, 1.6);
+    p.ellipse(113, 11, 5, 3.4, C.mustard);
+    p.ring(113, 11, 5, 3.4, A(C.ink, 0.4), 0.9);
   }],
 
   "furniture/wardrobe.png": [80, 136, (p) => {
-    p.rect(10, 131, 10, 5, C.woodDark);
-    p.rect(60, 131, 10, 5, C.woodDark);
-    p.rect(4, 4, 72, 128, C.wood);
-    p.strokeRect(4, 4, 72, 128, C.ink, 2);
-    p.rect(4, 4, 72, 10, C.woodDark);
-    p.strokeRect(4, 4, 72, 10, C.ink, 1.4);
-    p.rect(10, 18, 28, 104, C.cream);
-    p.rect(42, 18, 28, 104, C.cream);
-    p.strokeRect(10, 18, 28, 104, C.inkSoft, 1.4);
-    p.strokeRect(42, 18, 28, 104, C.inkSoft, 1.4);
-    p.ellipse(35, 70, 2.4, 2.4, C.yellow);
-    p.ellipse(45, 70, 2.4, 2.4, C.yellow);
-    p.ellipse(35, 70, 1, 1, C.ink);
-    p.ellipse(45, 70, 1, 1, C.ink);
-    p.line(40, 22, 40, 116, C.inkSoft, 1.2);
-    // A coral scarf peeking from the top
-    p.rect(25, 12, 8, 10, C.coral);
-    p.rect(51, 12, 7, 8, C.blue);
-    p.ellipse(20, 12, 1.8, 1.8, C.yellow);
-    p.ellipse(59, 12, 1.8, 1.8, C.yellow);
+    // Feet.
+    p.rect(10, 128, 10, 6, C.woodDark);
+    p.rect(60, 128, 10, 6, C.woodDark);
+
+    // Carcass.
+    p.rect(4, 8, 72, 122, C.wood);
+    p.strokeRect(3, 7, 74, 124, C.ink, 2);
+    bevel(p, 4, 8, 72, 122, C.woodLight, C.inkBrown);
+
+    // Cornice.
+    p.rect(1, 2, 78, 10, C.woodDark);
+    p.strokeRect(1, 2, 78, 10, C.ink, 1.6);
+    p.rect(1, 2, 78, 2.5, C.woodLight);
+
+    // Doors with inset panels.
+    for (const dx of [9, 41]) {
+      p.rect(dx, 16, 30, 106, C.cream);
+      p.strokeRect(dx, 16, 30, 106, A(C.ink, 0.7), 1.4);
+      p.rect(dx + 4, 22, 22, 44, A(C.sage, 0.55));
+      p.strokeRect(dx + 4, 22, 22, 44, A(C.ink, 0.28), 1);
+      p.rect(dx + 4, 72, 22, 44, A(C.sage, 0.55));
+      p.strokeRect(dx + 4, 72, 22, 44, A(C.ink, 0.28), 1);
+    }
+    // Brass handles.
+    p.ellipse(36, 70, 2.6, 4.6, C.mustard);
+    p.ellipse(44, 70, 2.6, 4.6, C.mustard);
+    p.ring(36, 70, 2.6, 4.6, A(C.inkBrown, 0.7), 0.9);
+    p.ring(44, 70, 2.6, 4.6, A(C.inkBrown, 0.7), 0.9);
+
+    // A coral scarf left hanging out, and a folded blanket on top.
+    p.rect(23, 10, 7, 16, C.terracotta);
+    p.rect(23, 10, 7, 2, C.terracottaDeep);
+    p.line(24, 14, 29, 14, A(C.terracottaDeep, 0.7), 1);
+    p.rect(52, 4, 20, 6, C.blue);
+    p.rect(52, 4, 20, 2, C.blueDeep);
   }],
 
   "furniture/storage_box.png": [76, 64, (p) => {
-    p.rect(5, 12, 66, 48, C.wood);
-    p.strokeRect(5, 12, 66, 48, C.ink, 2);
-    p.line(5, 28, 71, 28, C.woodDark, 1.4);
-    p.line(5, 44, 71, 44, C.woodDark, 1.4);
-    p.rect(2, 6, 72, 12, C.creamDeep);
-    p.strokeRect(2, 6, 72, 12, C.ink, 1.6);
-    p.rect(30, 18, 16, 12, C.cream);
-    p.strokeRect(30, 18, 16, 12, C.inkSoft, 1);
-    // Sprig on the lid
-    p.line(38, 6, 38, 1, C.leafDark, 1.4);
-    p.ellipse(34, 2.5, 3.5, 1.8, C.leaf);
-    p.ellipse(42, 3.5, 3.5, 1.8, C.leafPale);
+    // Crate body: horizontal slats, corner braces.
+    p.rect(4, 16, 68, 44, C.wood);
+    p.strokeRect(4, 16, 68, 44, C.ink, 1.8);
+    for (let y = 24; y < 56; y += 10) {
+      p.line(6, y, 70, y, A(C.woodDark, 0.5), 1.2);
+      p.line(6, y + 1.4, 70, y + 1.4, A(C.paper, 0.22), 1);
+    }
+    for (const bx of [4, 64]) {
+      p.rect(bx, 16, 8, 44, C.woodDark);
+      p.strokeRect(bx, 16, 8, 44, A(C.ink, 0.45), 1);
+    }
+
+    // Lid, slightly ajar, with two boards.
+    p.rect(2, 8, 72, 10, C.woodLight);
+    p.strokeRect(2, 8, 72, 10, C.ink, 1.6);
+    p.line(38, 9, 38, 17, A(C.inkBrown, 0.35), 1.2);
+
+    // Rope handle.
+    p.arc(38, 10, 11, 6, Math.PI * 1.05, Math.PI * 1.95, C.creamDeep, 2);
+
+    // Label and a sprig tucked under the lid.
+    p.rect(28, 28, 20, 12, C.paper);
+    p.strokeRect(28, 28, 20, 12, A(C.ink, 0.5), 1);
+    p.line(31, 32, 45, 32, A(C.inkSoft, 0.55), 0.9);
+    p.line(31, 36, 41, 36, A(C.inkSoft, 0.55), 0.9);
+    p.line(52, 8, 55, 1, C.leafDark, 1.4);
+    p.ellipse(50, 3, 3.6, 1.8, C.leaf);
+    p.ellipse(58, 4.5, 3.6, 1.8, C.leafPale);
   }],
 
   "furniture/shopping_phone.png": [80, 96, (p) => {
-    p.rect(33, 68, 14, 14, C.inkSoft);
-    p.rect(22, 82, 36, 8, C.woodDark);
-    p.strokeRect(22, 82, 36, 8, C.ink, 1.2);
-    p.rect(8, 8, 64, 62, C.ink);
-    p.strokeRect(8, 8, 64, 62, C.ink, 2);
-    p.rect(14, 14, 52, 40, C.blue);
-    p.strokeRect(14, 14, 52, 40, C.inkSoft, 1.2);
-    p.rect(14, 14, 52, 5, C.blueDark);
-    // App tiles
-    p.rect(18, 24, 10, 10, C.leaf);
-    p.rect(31, 24, 10, 10, C.yellow);
-    p.rect(44, 24, 10, 10, C.coral);
-    p.rect(18, 38, 10, 10, C.cream);
-    p.rect(31, 38, 10, 10, C.white);
-    p.rect(44, 38, 10, 10, C.leafPale);
-    p.ellipse(23, 29, 3, 2, C.cream);
-    p.ellipse(40, 43, 2.5, 2.5, C.coral);
-    p.ellipse(40, 59, 4, 4, C.cream);
-    p.strokeRect(40, 59, 0.2, 0.2, C.ink, 1);
-    p.ellipse(12, 11, 1.5, 1.5, C.yellow);
+    // Stand.
+    p.rect(31, 62, 18, 10, C.woodDark);
+    p.strokeRect(31, 62, 18, 10, A(C.ink, 0.6), 1.2);
+    p.rect(22, 80, 36, 9, C.wood);
+    p.strokeRect(22, 80, 36, 9, C.ink, 1.4);
+    p.rect(22, 80, 36, 2, C.woodLight);
+    p.arc(40, 62, 9, 12, Math.PI * 0.15, Math.PI * 0.85, A(C.ink, 0.45), 1.4);
+
+    // Terminal casing.
+    p.rect(6, 6, 68, 58, C.forest);
+    p.strokeRect(5, 5, 70, 60, C.ink, 2);
+    bevel(p, 6, 6, 68, 58, C.leaf, C.forestDeep);
+
+    // Screen with a soft warm glow.
+    p.rect(12, 12, 56, 38, C.paperDeep);
+    p.strokeRect(12, 12, 56, 38, C.forestDeep, 1.2);
+    p.rect(14, 14, 52, 6, C.cream);
+    for (let i = 0; i < 3; i += 1) {
+      p.ellipse(18 + i * 4, 17, 1.1, 1.1, A(C.ink, 0.5));
+    }
+
+    // App tiles: store, second life, ledger, bag.
+    const tile = (tx, ty, color, symbol) => {
+      p.rect(tx, ty, 11, 11, color);
+      p.strokeRect(tx, ty, 11, 11, A(C.ink, 0.35), 0.7);
+      symbol(tx, ty);
+    };
+    tile(17, 24, C.leaf, (x, y) => p.ellipse(x + 5.5, y + 5.5, 3, 2, C.paper));
+    tile(32, 24, C.mustard, (x, y) => p.rect(x + 5, y + 3, 2, 6, C.forest));
+    tile(47, 24, C.terracotta, (x, y) => p.arc(x + 5.5, y + 6, 3, 2.4, Math.PI, Math.PI * 2, C.paper, 1));
+    tile(17, 36, C.blue, (x, y) => p.rect(x + 3, y + 5, 5, 3, C.paper));
+    tile(32, 36, C.sage, (x, y) => p.line(x + 3, y + 8, x + 8, y + 3, C.paper, 1.2));
+    tile(47, 36, C.creamDeep, (x, y) => p.ellipse(x + 5.5, y + 5.5, 2, 2, C.terracotta));
+
+    // Bottom status bar + power light.
+    p.rect(12, 52, 56, 7, A(C.paper, 0.75));
+    p.rect(12, 52, 56, 1, A(C.ink, 0.15));
+    p.ellipse(68, 30, 1.6, 1.6, C.mustard);
+    p.ellipse(40, 58, 1.6, 1.6, C.mustardDeep);
   }],
 
   "furniture/donation_station.png": [88, 92, (p) => {
-    p.rect(14, 38, 10, 50, C.woodDark);
-    p.rect(66, 38, 10, 50, C.woodDark);
-    p.strokeRect(14, 38, 10, 50, C.ink, 1.2);
-    p.strokeRect(66, 38, 10, 50, C.ink, 1.2);
-    p.rect(5, 26, 78, 16, C.wood);
-    p.strokeRect(5, 26, 78, 16, C.ink, 2);
-    p.rect(20, 6, 48, 26, C.creamDeep);
-    p.strokeRect(20, 6, 48, 26, C.ink, 1.6);
-    p.ellipse(38, 15, 5.5, 5, C.coral);
-    p.ellipse(46, 15, 5.5, 5, C.coral);
-    p.rect(33, 16, 18, 7, C.coral);
-    p.line(38, 22, 36, 28, C.coral, 3);
-    p.line(46, 22, 48, 28, C.coral, 3);
-    // Reuse arrows
-    p.line(28, 62, 42, 62, C.leafDark, 2.4);
-    p.line(42, 62, 38, 58, C.leafDark, 2);
-    p.line(42, 62, 38, 66, C.leafDark, 2);
-    p.line(60, 74, 46, 74, C.leafDark, 2.4);
-    p.line(46, 74, 50, 70, C.leafDark, 2);
-    p.line(46, 74, 50, 78, C.leafDark, 2);
+    // Legs.
+    p.rect(14, 52, 9, 36, C.woodDark);
+    p.rect(65, 52, 9, 36, C.woodDark);
+    p.strokeRect(14, 52, 9, 36, A(C.ink, 0.6), 1.1);
+    p.strokeRect(65, 52, 9, 36, A(C.ink, 0.6), 1.1);
+
+    // Counter.
+    p.rect(3, 34, 82, 18, C.wood);
+    p.strokeRect(2, 33, 84, 20, C.ink, 1.8);
+    p.rect(3, 34, 82, 4, C.woodLight);
+    p.rect(3, 48, 82, 4, C.woodDark);
+
+    // Front apron with the reuse mark.
+    p.rect(14, 52, 60, 14, C.cream);
+    p.strokeRect(14, 52, 60, 14, A(C.ink, 0.45), 1.1);
+    p.arc(36, 59, 7, 4, Math.PI * 0.15, Math.PI * 0.85, C.leafDark, 1.8);
+    p.arc(36, 59, 7, 4, Math.PI * 1.15, Math.PI * 1.85, C.leafDark, 1.8);
+    p.line(29, 56, 26, 59, C.leafDark, 1.6);
+    p.line(43, 62, 46, 59, C.leafDark, 1.6);
+
+    // Woven basket on the counter.
+    p.rect(24, 8, 40, 26, C.mustard);
+    p.strokeRect(23, 7, 42, 28, C.ink, 1.6);
+    for (let y = 12; y < 32; y += 5) {
+      p.line(25, y, 63, y, A(C.mustardDeep, 0.55), 1.2);
+    }
+    for (let x = 28; x < 64; x += 6) {
+      p.line(x, 9, x, 33, A(C.mustardDeep, 0.3), 0.9);
+    }
+    p.rect(23, 7, 42, 5, C.mustardDeep);
+    p.rect(23, 7, 42, 1.6, C.paper);
+    p.ellipse(44, 18, 4, 3, C.leaf);
+    p.line(44, 21, 44, 26, C.leafDark, 1);
+
+    // A repaired jar and a folded cloth on the left.
+    p.rect(8, 22, 10, 11, C.blue);
+    p.strokeRect(8, 22, 10, 11, A(C.ink, 0.5), 1);
+    p.rect(7, 20, 12, 3, C.creamDeep);
+    p.rect(70, 24, 12, 9, C.terracotta);
+    p.rect(70, 24, 12, 2, C.terracottaDeep);
   }],
 
   "furniture/plant.png": [44, 64, (p) => {
-    p.rect(13, 43, 18, 17, C.coral);
-    p.strokeRect(13, 43, 18, 17, C.ink, 1.6);
-    p.rect(10, 39, 24, 7, C.creamDeep);
-    p.strokeRect(10, 39, 24, 7, C.ink, 1.4);
-    p.line(22, 42, 22, 12, C.leafDark, 1.8);
-    p.ellipse(15, 31, 8, 4, C.leaf);
-    p.ellipse(29, 27, 8, 4, C.leaf);
-    p.ellipse(14, 21, 7, 3.5, C.leafPale);
-    p.ellipse(28, 17, 7, 3.5, C.leaf);
-    p.ellipse(22, 10, 5, 3.5, C.leafPale);
-    p.line(13, 31, 21, 31, C.leafDark, 0.8);
-    p.line(23, 27, 31, 27, C.leafDark, 0.8);
-    p.line(23, 18, 31, 17, C.leafDark, 0.8);
-  }],
+    // Pot.
+    p.rect(13, 42, 18, 19, C.terracotta);
+    p.strokeRect(12.5, 41.5, 19, 20, C.ink, 1.6);
+    p.rect(10, 37, 24, 6, C.terracottaDeep);
+    p.strokeRect(9.5, 36.5, 25, 7, C.ink, 1.4);
+    p.rect(11, 38, 22, 1.6, A(C.cream, 0.6));
+    p.rect(14, 45, 3, 10, A(C.cream, 0.25));
+    p.ellipse(22, 42, 8, 2.4, C.inkBrown);
 
-  "items/headphones.png": [32, 32, (p) => {
-    p.arc(16, 17, 11, 10, Math.PI, Math.PI * 2, C.ink, 3);
-    p.rect(4, 16, 7, 11, C.coral);
-    p.strokeRect(4, 16, 7, 11, C.ink, 1.2);
-    p.rect(21, 16, 7, 11, C.coral);
-    p.strokeRect(21, 16, 7, 11, C.ink, 1.2);
-    p.rect(6, 19, 3, 5, C.creamDeep);
-    p.rect(23, 19, 3, 5, C.creamDeep);
-    p.arc(16, 17, 7, 7, Math.PI * 1.15, Math.PI * 1.85, C.cream, 1);
-  }],
-
-  "items/hoodie.png": [32, 32, (p) => {
-    p.rect(9, 10, 14, 15, C.coral);
-    p.strokeRect(9, 10, 14, 15, C.ink, 1.4);
-    p.rect(3, 11, 6, 13, C.coral);
-    p.strokeRect(3, 11, 6, 13, C.ink, 1.2);
-    p.rect(23, 11, 6, 13, C.coral);
-    p.strokeRect(23, 11, 6, 13, C.ink, 1.2);
-    p.arc(16, 11, 7, 4, Math.PI, Math.PI * 2, C.coralDark, 4);
-    p.rect(13, 15, 6, 5, C.coralDark);
-    p.line(13, 11, 13, 17, C.cream, 1);
-    p.line(19, 11, 19, 17, C.cream, 1);
-    p.rect(12, 22, 8, 3, C.coralDark);
-  }],
-
-  "items/sneakers.png": [32, 32, (p) => {
-    p.rect(4, 19, 21, 8, C.blue);
-    p.strokeRect(4, 19, 21, 8, C.ink, 1.3);
-    p.rect(4, 25, 21, 3, C.cream);
-    p.rect(9, 21, 3, 2, C.cream);
-    p.rect(14, 21, 3, 2, C.cream);
-    p.rect(19, 21, 3, 2, C.cream);
-    p.rect(8, 9, 21, 8, C.blueDark);
-    p.strokeRect(8, 9, 21, 8, C.ink, 1.3);
-    p.rect(8, 15, 21, 3, C.cream);
-    p.rect(13, 11, 3, 2, C.cream);
-    p.rect(18, 11, 3, 2, C.cream);
-  }],
-
-  "items/water_bottle.png": [32, 32, (p) => {
-    p.rect(13, 5, 6, 4, C.ink);
-    p.rect(12, 9, 8, 19, C.blue);
-    p.strokeRect(12, 9, 8, 19, C.ink, 1.4);
-    p.rect(13, 4, 6, 3, C.creamDeep);
-    p.strokeRect(13, 4, 6, 3, C.ink, 1);
-    p.rect(14, 12, 2, 12, C.cream);
-    p.rect(12, 17, 8, 4, C.leaf);
-    p.line(12, 21, 20, 21, C.leafDark, 1);
-    p.rect(13, 26, 6, 2, C.blueDark);
-  }],
-
-  // Product items. Each is a separate file so a delivered purchase can be
-  // redrawn on its own, without touching the household item it resembles.
-  "items/trendy_sneakers.png": [32, 32, (p) => {
-    // Chunky sneaker with a coral swoosh and yellow sole stripe.
-    p.rect(4, 20, 24, 8, C.white);
-    p.strokeRect(3.5, 19.5, 25, 9, C.ink, 1.3);
-    p.rect(4, 25, 24, 3, C.coral);
-    p.rect(9, 10, 19, 9, C.white);
-    p.strokeRect(8.5, 9.5, 20, 10, C.ink, 1.3);
-    p.line(10, 16, 24, 20, C.coralDark, 2.2);
-    p.rect(11, 12, 3, 2, C.yellow);
-    p.rect(16, 12, 3, 2, C.yellow);
-    p.rect(21, 13, 3, 2, C.yellow);
-    p.rect(5, 23, 4, 2, C.creamDeep);
-    p.rect(4, 27, 24, 1.4, C.coralDark);
-  }],
-
-  "items/wireless_headphones.png": [32, 32, (p) => {
-    // Over-ear pair with no cable: blue band, yellow cups.
-    p.arc(16, 18, 12, 11, Math.PI, Math.PI * 2, C.blueDark, 3.4);
-    p.arc(16, 18, 12, 11, Math.PI * 0.98, Math.PI * 2.02, C.ink, 1);
-    p.rect(3, 17, 8, 12, C.yellow);
-    p.strokeRect(2.5, 16.5, 9, 13, C.ink, 1.3);
-    p.rect(22, 17, 8, 12, C.yellow);
-    p.strokeRect(21.5, 16.5, 9, 13, C.ink, 1.3);
-    p.rect(5, 20, 4, 6, C.creamDeep);
-    p.rect(23, 20, 4, 6, C.creamDeep);
-    p.arc(16, 18, 8, 7, Math.PI * 1.15, Math.PI * 1.85, C.cream, 1);
-  }],
-
-  "items/party_speaker.png": [32, 32, (p) => {
-    // Small speaker box: coral handle, cream grille, yellow knob.
-    p.rect(6, 8, 20, 21, C.woodDark);
-    p.strokeRect(6, 8, 20, 21, C.ink, 1.4);
-    p.rect(9, 12, 14, 11, C.cream);
-    p.strokeRect(9, 12, 14, 11, C.inkSoft, 1);
-    p.ellipse(16, 17.5, 3.4, 3.4, C.inkSoft);
-    p.ellipse(16, 17.5, 1.6, 1.6, C.creamDeep);
-    p.ellipse(11.6, 14.6, 1.1, 1.1, C.ink);
-    p.ellipse(20.4, 20.4, 1.1, 1.1, C.ink);
-    p.rect(11, 26, 10, 2.4, C.yellow);
-    p.arc(16, 8, 5, 4, Math.PI, Math.PI * 2, C.coral, 2);
-    p.line(11, 8, 11, 6, C.coral, 1.6);
-    p.line(21, 8, 21, 6, C.coral, 1.6);
+    // Stems and leaves.
+    const leaf = (cx, cy, rx, ry, tilt, dark) => {
+      p.ellipse(cx, cy, rx, ry, dark ? C.leaf : C.leafPale);
+      p.line(cx - rx * 0.7, cy + ry * 0.2, cx + rx * 0.7, cy - ry * 0.2, A(C.leafDark, 0.6), 0.8);
+      p.ring(cx, cy, rx, ry, A(C.leafDark, 0.35), 0.7);
+    };
+    p.line(21, 42, 21, 18, C.leafDark, 1.8);
+    p.line(21, 32, 12, 27, C.leafDark, 1.4);
+    p.line(21, 26, 30, 20, C.leafDark, 1.4);
+    p.line(21, 22, 17, 13, C.leafDark, 1.2);
+    leaf(11, 26, 8.5, 4, 0, false);
+    leaf(31, 19, 8, 3.8, 0, true);
+    leaf(16, 13, 6.5, 3.4, 0, true);
+    leaf(23, 8, 6, 3, 0, false);
+    leaf(29, 28, 6, 3, 0, false);
   }],
 
   "items/parcel.png": [40, 40, (p) => {
+    // Kraft box.
     p.rect(6, 12, 28, 23, C.wood);
-    p.strokeRect(6, 12, 28, 23, C.ink, 1.6);
-    p.rect(6, 12, 28, 5, C.woodDark);
-    p.rect(19, 12, 6, 23, C.yellow);
-    p.line(9, 20, 17, 20, C.woodDark, 1.2);
-    p.line(9, 27, 17, 27, C.woodDark, 1.2);
-    p.rect(27, 24, 5, 7, C.cream);
-    p.strokeRect(27, 24, 5, 7, C.inkSoft, 0.9);
-    p.ellipse(29.5, 26.5, 1.5, 1.2, C.leaf);
+    p.strokeRect(5.5, 11.5, 29, 24, C.ink, 1.6);
+    p.rect(6, 12, 28, 4, C.woodDark);
+    p.rect(6, 12, 28, 1.4, A(C.cream, 0.35));
+    // Flaps seam + tape.
+    p.line(20, 12, 20, 35, A(C.inkBrown, 0.4), 1);
+    p.rect(18, 12, 5, 23, C.mustard);
+    p.rect(18, 12, 5, 1.2, A(C.paper, 0.5));
+    // Label.
+    p.rect(24, 21, 9, 9, C.paper);
+    p.strokeRect(24, 21, 9, 9, A(C.ink, 0.55), 0.9);
+    p.line(26, 24, 31, 24, A(C.inkSoft, 0.6), 0.8);
+    p.line(26, 27, 30, 27, A(C.inkSoft, 0.6), 0.8);
+    p.ellipse(27, 29, 1.2, 1.2, C.leaf);
+    // String.
+    p.line(8, 15, 14, 15, C.creamDeep, 1.1);
+    p.line(8, 15, 8, 33, A(C.creamDeep, 0.8), 1.1);
+    // Corner shade.
+    p.rect(6, 30, 28, 5, A(C.inkBrown, 0.12));
+  }],
+
+  "items/headphones.png": [32, 32, (p) => {
+    // Cable.
+    p.arc(16, 20, 8, 9, Math.PI * 0.15, Math.PI * 0.95, A(C.ink, 0.5), 1);
+    // Band.
+    p.arc(16, 18, 12, 11, Math.PI * 1.02, Math.PI * 1.98, C.ink, 3.2);
+    p.arc(16, 18, 12, 11, Math.PI * 1.05, Math.PI * 1.95, A(C.cream, 0.35), 1);
+    // Cups.
+    for (const cx of [5.5, 26.5]) {
+      p.rect(cx - 4.5, 15, 9, 12, C.terracotta);
+      p.strokeRect(cx - 4.5, 15, 9, 12, C.ink, 1.3);
+      p.rect(cx - 3, 17, 6, 8, C.creamDeep);
+      p.rect(cx - 4, 16, 1.2, 9, A(C.paper, 0.35));
+    }
+    p.rect(13.5, 18, 5, 3, A(C.ink, 0.25));
+  }],
+
+  "items/hoodie.png": [32, 32, (p) => {
+    // Sleeves.
+    p.rect(3, 12, 7, 13, C.coral);
+    p.rect(22, 12, 7, 13, C.coral);
+    p.strokeRect(3, 12, 7, 13, C.ink, 1.2);
+    p.strokeRect(22, 12, 7, 13, C.ink, 1.2);
+    p.rect(4, 23, 5, 2, C.coralDark);
+    p.rect(23, 23, 5, 2, C.coralDark);
+    // Body.
+    p.rect(9, 11, 14, 16, C.coral);
+    p.strokeRect(8.5, 10.5, 15, 17, C.ink, 1.4);
+    p.rect(10, 12, 2, 13, A(C.paper, 0.18));
+    // Hood.
+    p.arc(16, 12, 7, 5, Math.PI, Math.PI * 2, C.coralDark, 4);
+    p.ring(16, 12, 6.5, 4.4, A(C.ink, 0.35), 1);
+    // Drawstrings + pocket.
+    p.line(13, 13, 13, 19, C.cream, 1);
+    p.line(19, 13, 19, 19, C.cream, 1);
+    p.rect(12, 20, 8, 5, C.coralDark);
+    p.strokeRect(12, 20, 8, 5, A(C.ink, 0.45), 1);
+    // Ribbed hem.
+    p.rect(9, 25, 14, 2.4, C.coralDark);
+  }],
+
+  "items/sneakers.png": [32, 32, (p) => {
+    // Sole.
+    p.rect(4, 23, 24, 5, C.cream);
+    p.strokeRect(4, 23, 24, 5, C.ink, 1.3);
+    p.rect(4, 26.5, 24, 1.4, C.creamDeep);
+    // Upper.
+    p.rect(6, 15, 22, 9, C.blue);
+    p.strokeRect(5.5, 14.5, 23, 9.5, C.ink, 1.3);
+    p.rect(7, 16, 20, 2, A(C.paper, 0.25));
+    // Toe cap and heel.
+    p.ellipse(26, 20, 3.6, 3.4, C.blueDeep);
+    p.ring(26, 20, 3.6, 3.4, A(C.ink, 0.4), 1);
+    p.rect(6, 15, 3, 9, C.blueDeep);
+    // Laces.
+    for (let i = 0; i < 3; i += 1) {
+      p.line(11 + i * 5, 16, 14 + i * 5, 21, C.cream, 1.2);
+    }
+    // Stitching along the sole.
+    p.rect(5, 22.5, 22, 1, A(C.ink, 0.18));
+  }],
+
+  "items/water_bottle.png": [32, 32, (p) => {
+    // Bottle body.
+    p.rect(12, 9, 9, 19, C.blue);
+    p.strokeRect(11.5, 8.5, 10, 20, C.ink, 1.4);
+    p.rect(13, 10, 2, 16, A(C.paper, 0.28));
+    // Cap.
+    p.rect(13, 4, 7, 5, C.creamDeep);
+    p.strokeRect(12.5, 3.5, 8, 6, C.ink, 1.1);
+    p.rect(13.5, 4.5, 6, 1.2, C.paper);
+    // Label.
+    p.rect(12, 16, 9, 6, C.leaf);
+    p.strokeRect(12, 16, 9, 6, A(C.ink, 0.4), 0.9);
+    p.line(13, 19, 20, 19, A(C.paper, 0.7), 1);
+    p.ellipse(16.5, 18, 1.6, 1.2, C.paper);
+    // Base shade.
+    p.rect(12, 26, 9, 2, C.blueDeep);
+  }],
+
+  "items/trendy_sneakers.png": [32, 32, (p) => {
+    // Thick cream sole.
+    p.rect(3, 21, 26, 7, C.paper);
+    p.strokeRect(2.5, 20.5, 27, 8, C.ink, 1.3);
+    p.rect(3, 26, 26, 2, C.mustard);
+    // Upper.
+    p.rect(8, 11, 19, 10, C.paper);
+    p.strokeRect(7.5, 10.5, 20, 11, C.ink, 1.3);
+    p.rect(9, 12, 17, 1.6, A(C.paperDeep, 0.9));
+    // Swoosh.
+    p.line(10, 18, 24, 13, C.terracottaDeep, 2.4);
+    p.line(11, 19.4, 25, 14.4, A(C.terracotta, 0.7), 1.2);
+    // Laces.
+    for (let i = 0; i < 3; i += 1) {
+      p.line(12 + i * 4, 13, 14 + i * 4, 17, C.mustardDeep, 1);
+    }
+    // Heel tab.
+    p.rect(7, 12, 2.6, 7, C.terracotta);
+  }],
+
+  "items/wireless_headphones.png": [32, 32, (p) => {
+    // Band.
+    p.arc(16, 18, 12, 12, Math.PI * 1.02, Math.PI * 1.98, C.blueDeep, 3.4);
+    p.arc(16, 18, 12, 12, Math.PI * 1.06, Math.PI * 1.94, A(C.paper, 0.35), 1);
+    p.arc(16, 18, 8, 8, Math.PI * 1.15, Math.PI * 1.85, A(C.cream, 0.5), 1);
+    // Cups.
+    for (const cx of [5, 27]) {
+      p.rect(cx - 4.6, 16, 9.2, 12, C.mustard);
+      p.strokeRect(cx - 4.6, 16, 9.2, 12, C.ink, 1.3);
+      p.rect(cx - 3, 18, 6, 8, C.creamDeep);
+      p.ring(cx, 22, 2.4, 2.4, A(C.ink, 0.25), 0.9);
+    }
+    // Tiny power light.
+    p.ellipse(27, 26, 1, 1, C.leafDeep);
+  }],
+
+  "items/party_speaker.png": [32, 32, (p) => {
+    // Box.
+    p.rect(6, 8, 20, 21, C.woodMid);
+    p.strokeRect(5.5, 7.5, 21, 22, C.ink, 1.4);
+    p.rect(7, 9, 18, 2, A(C.paper, 0.3));
+    // Grille.
+    p.rect(9, 12, 14, 12, C.cream);
+    p.strokeRect(9, 12, 14, 12, A(C.ink, 0.4), 1);
+    p.ellipse(16, 18, 3.6, 3.6, C.inkSoft);
+    p.ellipse(16, 18, 2, 2, C.creamDeep);
+    p.ellipse(16, 18, 0.9, 0.9, C.ink);
+    for (let i = 0; i < 4; i += 1) {
+      p.ellipse(12 + i * 2.6, 22.5, 0.7, 0.7, A(C.ink, 0.35));
+      p.ellipse(12 + i * 2.6, 13.6, 0.7, 0.7, A(C.ink, 0.35));
+    }
+    // Knob strip.
+    p.rect(11, 26, 10, 2.6, C.mustard);
+    p.ellipse(24, 27.2, 1.3, 1.3, C.terracotta);
+    // Coral strap.
+    p.arc(16, 8, 6, 5, Math.PI, Math.PI * 2, C.terracotta, 2);
   }],
 
   "ui/interaction_icon.png": [24, 24, (p) => {
-    p.rect(2, 2, 20, 20, C.cream);
-    p.strokeRect(2, 2, 20, 20, C.ink, 1.8);
-    p.rect(9, 7, 8, 2.2, C.ink);
-    p.rect(9, 7, 2.2, 10, C.ink);
-    p.rect(9, 11.5, 6, 2, C.ink);
-    p.rect(9, 15, 8, 2.2, C.ink);
+    p.rect(3, 4, 19, 19, A(C.ink, 0.25));
+    p.rect(2, 2, 20, 20, C.mustard);
+    p.strokeRect(2, 2, 20, 20, C.forest, 1.8);
+    p.rect(3.5, 3.5, 17, 2, A(C.paper, 0.55));
+    p.rect(9, 6.5, 8, 2.4, C.forest);
+    p.rect(9, 6.5, 2.4, 11, C.forest);
+    p.rect(9, 11.5, 6, 2.2, C.forest);
+    p.rect(9, 15.5, 8, 2.4, C.forest);
   }],
 };
 
