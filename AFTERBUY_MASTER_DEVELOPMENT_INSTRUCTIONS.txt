@@ -1,0 +1,306 @@
+AFTERBUY — MASTER DEVELOPMENT INSTRUCTIONS
+
+Project type: 2D browser game Working title: AFTERBUY: A Little More
+Life Purpose: A short, genuinely playable cozy game about responsible
+consumption. Audience: Students and young adults. Development
+constraint: Build a small complete game quickly. Prioritize working
+gameplay over content volume or polish.
+
+THIS FILE IS THE PROJECT’S SOURCE OF TRUTH
+
+Read this file before making changes. Keep it in the project root and
+refer to it in every development stage. Do not replace these
+instructions with a new plan unless the user explicitly asks.
+
+CORE REQUIREMENT
+
+AFTERBUY must be a GAME, not a website made of cards, buttons,
+questionnaires, or static panels.
+
+The player must: - Control a character in a visible 2D world. - Walk
+around a small home environment. - Collide with walls and furniture. -
+Approach objects and interact with them based on proximity. - Make
+consumption decisions that change the actual game state. - See purchases
+and possessions represented in the world or a coherent inventory. -
+Experience consequences over in-game time. - Repair, reuse, donate,
+resell, or appropriately recycle an unused item. - Complete a short run
+and reach an ending. - Restart cleanly.
+
+The surrounding UI may contain buttons for an in-game interaction, but
+the core experience must be direct movement and world-based interaction.
+
+GAME CONCEPT
+
+The player lives in a small, cozy home and manages a limited budget and
+a growing set of possessions. A shopping terminal or phone presents
+tempting products. The player can buy, wait, reuse an item already
+owned, or borrow/share when plausible. Purchases spend money and create
+possessions. As days pass, items can become unused. The player can
+interact with unused items and choose a suitable second-life action.
+
+The game must not shame the player for every purchase. A necessary,
+durable, frequently used purchase can be a good choice. The design
+should help players consider need, use, repair, sharing, and product
+lifespan.
+
+MINIMUM PLAYABLE LOOP
+
+1.  Start a new run in a small top-down or slightly angled 2D home.
+2.  Move a character using WASD or arrow keys.
+3.  Walk up to at least three world objects and interact using E or
+    Space.
+4.  Inspect existing possessions and discover one unused or worn item.
+5.  Approach a shopping phone/terminal and inspect a product.
+6.  Choose buy, wait, reuse, or borrow/share when appropriate.
+7.  If buying, deduct the correct amount and create a real item/parcel
+    in the world or inventory.
+8.  Advance the in-game day.
+9.  Find an unused item and repair, reuse, donate, resell, or recycle it
+    appropriately.
+10. Finish a short run of about three to five minutes and show a
+    summary.
+11. Restart without stale or duplicated state.
+
+Keep the first playable version small: one room, one character, three
+interactable household objects, two purchasable products, one
+repair/donation interaction, a short day progression, and an ending. Add
+more only after the complete loop works.
+
+TECHNICAL RULES
+
+1.  Inspect the existing workspace before coding. Reuse an existing
+    functioning project where sensible.
+2.  Do not overwrite or break existing working configuration without a
+    clear reason.
+3.  If no suitable framework exists, use HTML5 Canvas and plain
+    JavaScript modules with minimal dependencies. If a suitable browser
+    game framework already exists, reuse it.
+4.  The game must run locally and work as a static website without an
+    account, backend, paid service, or network dependency.
+5.  Use delta time for movement and keep game speed independent of frame
+    rate.
+6.  Separate game logic from rendering and UI.
+7.  Use a central game state as the source of truth for money, day,
+    player position, owned items, item conditions, purchase history, and
+    completed actions.
+8.  A purchased item must not exist as contradictory duplicate records
+    in the world and inventory.
+9.  Restart must reset all run state, timers, listeners, world entities,
+    and counters.
+10. Missing art files must trigger a visible fallback placeholder rather
+    than crash the game.
+11. Do not add unnecessary dependencies, databases, accounts,
+    leaderboards, analytics, or complex architecture.
+12. Do not stop after writing a plan. Implement, run, test, fix, and
+    document the project.
+
+CONTROLS
+
+Movement: WASD and arrow keys. Interact: E or Space. Escape: Close an
+in-game dialogue or pause if implemented. Never unexpectedly reset the
+run. Mouse: Use only for small in-game menus where appropriate. Show the
+interaction prompt only when the player is within the object’s
+interaction radius. Distant objects must not be interactable.
+
+VISUAL DIRECTION
+
+Cozy, colorful, handmade 2D indie-game look. Use a warm cream base with
+leafy green, coral, soft yellow, dusty blue, and dark green outlines.
+The world should feel like a place, not a dashboard.
+
+Use original temporary placeholders: simple shapes, hand-drawn-style
+geometric sprites, basic animations, and primitive environmental art. Do
+not use AI-generated final art, external stock images, or paid assets.
+Do not spend time generating elaborate placeholder art.
+
+World requirements: - Floor and wall boundaries. - Bed or sofa. -
+Desk. - Wardrobe. - Storage box or shelf. - Shopping phone/terminal. -
+Parcel/product object after purchase. - Donation/second-life station. -
+A few optional plants or decorative objects. - Solid collision for walls
+and major furniture. - Visible interaction prompt and short dialogue. -
+Compact HUD for day, money, and inventory count.
+
+PLACEHOLDER ART MUST BE EASY TO REPLACE
+
+Keep all replaceable art in a clear assets/ directory. Use a central
+asset manifest mapping stable logical IDs to file paths. Gameplay code
+must refer to logical IDs, not hard-coded image paths scattered
+throughout the project.
+
+Suggested directory: assets/ characters/ environments/ furniture/ items/
+ui/ audio/
+
+Suggested logical IDs: player_idle player_walk floor_tile wall_tile bed
+sofa desk wardrobe storage_box shopping_phone parcel sneakers headphones
+water_bottle hoodie donation_station plant interaction_icon
+
+Use consistent placeholder sizes, anchor points, and sprite-sheet
+conventions. If an asset is missing, render a fallback shape or
+emoji-like symbol and log a helpful development warning. Never let a
+missing drawing crash the game.
+
+Create and maintain ART_REPLACEMENT.md. It must explain: - Where each
+asset goes. - Exact filenames expected. - Recommended dimensions and
+transparent-background requirements. - Sprite-sheet layout and animation
+frame order. - How to replace a placeholder without changing gameplay
+code. - A complete art task list grouped by character, environment,
+furniture, items, and UI. - Which art is mandatory for the current build
+and which is optional. - The current status of each art item:
+placeholder, needed, imported, or tested.
+
+MANDATORY PROJECT DOCUMENTS
+
+These documents must be created in the project root and updated whenever
+relevant. Do not create them only at the end.
+
+1.  MASTER_DEVELOPMENT_INSTRUCTIONS.txt This file. Keep it as the main
+    source of truth.
+
+2.  DEVELOPMENT_LOG.md Append a dated/time-stamped entry after each
+    meaningful change. Record:
+
+    -   What was changed.
+    -   Why it was changed.
+    -   Files created, modified, or deleted.
+    -   Features implemented.
+    -   Tests run and their results.
+    -   Errors encountered, including console/build/runtime errors.
+    -   Root cause if known.
+    -   Fix attempted and whether it worked.
+    -   Remaining bugs or risks.
+    -   Next concrete step. Never erase failed attempts or rewrite
+        history to make the project look error-free. Keep entries
+        concise but honest. If a test was not run, say so.
+
+3.  README.md Keep this accurate throughout development. Include:
+
+    -   Game description and current feature status.
+    -   Framework/libraries and project structure.
+    -   Exact prerequisites.
+    -   Exact command to install dependencies, if any.
+    -   Exact command to start the local development server.
+    -   Local URL to open.
+    -   How to build/export for static hosting, if applicable.
+    -   How to deploy the built files to ordinary static hosting.
+    -   Controls.
+    -   How to replace/add hand-drawn art.
+    -   Known limitations and troubleshooting. Never invent commands.
+        Verify them against the actual project setup.
+
+4.  ART_REPLACEMENT.md Maintain the complete asset list, file paths,
+    dimensions, sprite-sheet specifications, import steps, and art
+    status. Update it when an asset is added, renamed, removed, or the
+    expected dimensions change.
+
+5.  TEST_REPORT.md Record tests that were actually run, including:
+
+    -   Launch/build result.
+    -   Movement in all directions.
+    -   Collision.
+    -   Interaction distance.
+    -   Buying and budget changes.
+    -   Item spawning and inventory state.
+    -   Waiting/reuse/borrow behavior.
+    -   Repair/donation/resale/recycling.
+    -   Day progression.
+    -   Ending and statistics.
+    -   Restart/reset.
+    -   Missing asset fallback.
+    -   Browser size/responsiveness. For every test, record PASS, FAIL,
+        or NOT TESTED, with notes. Never claim a test passed without
+        performing it.
+
+6.  GAME_DESIGN.md Keep a concise description of the core loop, game
+    state, item lifecycle, interaction rules, and current scope. Update
+    only when the actual design changes.
+
+DEVELOPMENT WORKFLOW
+
+Stage 0 — Inspect: - Inspect the workspace, package/config files, and
+existing code. - Identify how the current project runs. - Summarize the
+existing structure in DEVELOPMENT_LOG.md. - Create the mandatory
+documents before substantial implementation. - Do not spend excessive
+time planning.
+
+Stage 1 — Playable world: - Create or preserve the game canvas. - Add
+the home environment, player, movement, collision, and proximity
+interactions. - Use placeholder art. - Run it and verify movement and
+collision.
+
+Stage 2 — Consumption decisions: - Add a shopping terminal, at least two
+products, budget, and buy/wait/reuse options. - Ensure buying changes
+the actual state and creates a possession. - Test every choice.
+
+Stage 3 — Item lifecycle: - Add day progression and one working repair
+or donation action. - Make the item’s state and world representation
+change. - Complete the run and ending. - Test from a fresh launch.
+
+Stage 4 — Polish and docs: - Improve game feel only after the core loop
+works. - Test restart, edge cases, and missing art fallback. - Update
+all documents. - Verify README instructions against the actual project.
+
+SCOPE PRIORITIES
+
+P0 MUST WORK: - Character movement. - Collision. - World-based proximity
+interaction. - At least two meaningful shopping options. - Correct money
+updates. - Visible/recorded possession changes. - At least one
+second-life action. - Day progression. - Ending and restart.
+
+P1 IF TIME PERMITS: - More product types. - Several object
+interactions. - Walk/idle animations. - Small sound effects. - Subtle
+lighting or time-of-day transition. - More nuanced item condition and
+usage.
+
+P2 DO NOT PRIORITIZE: - Multiple levels. - Large world. - NPC
+schedules. - Complex crafting. - Procedural generation. - Online
+services. - Accounts or leaderboards. - Elaborate save system.
+
+TESTING AND QUALITY GATE
+
+The game is not complete merely because code exists. Launch the actual
+project and test it. Use browser automation or a preview tool if
+available; otherwise run the project and clearly state what was and was
+not manually verified.
+
+At minimum test: - App launches without errors. - Character moves in all
+four directions. - Character cannot pass through walls/furniture. -
+Interaction only works nearby. - Buying deducts the correct amount. -
+Purchased item appears exactly once. - Reuse does not charge money or
+duplicate possessions. - Repair cost and item condition update
+correctly. - Donation/resale removes item from the home. - Day
+progression works. - Ending statistics match the state. - Restart resets
+all state. - Missing assets fall back safely. - Common desktop browser
+sizes remain playable.
+
+Fix failures before adding optional features. If something cannot be
+tested, mark it NOT TESTED in TEST_REPORT.md.
+
+WORKING RULES FOR THE CODING AGENT
+
+-   Work directly in the project workspace.
+-   Do not give the user a collection of snippets to assemble manually.
+-   Do not stop after planning.
+-   Do not replace gameplay with static UI.
+-   Do not silently delete working functionality.
+-   Do not claim success without running the relevant test.
+-   Keep the project understandable for a solo developer.
+-   Update DEVELOPMENT_LOG.md after every meaningful implementation
+    stage and every important bug fix.
+-   Update README.md when start commands, structure, controls, or
+    hosting instructions change.
+-   Update ART_REPLACEMENT.md whenever the asset list or import rules
+    change.
+-   Update TEST_REPORT.md after each test pass.
+-   If a request is ambiguous, choose the simplest option that preserves
+    the core game loop and document the assumption.
+-   Before finishing a stage, state what changed, what was tested, what
+    failed, and what happens next.
+
+FINAL ACCEPTANCE TEST
+
+A new player can launch the game, walk around a cozy 2D home, approach
+and interact with an object, inspect a shopping temptation, make a
+consumption choice, see the game state/world change, give an unused item
+a second life, complete the run, view a summary, and restart.
+
+If this sequence does not work, the game is not finished.

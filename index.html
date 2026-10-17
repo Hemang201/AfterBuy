@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <title>AFTERBUY: A Little More Life</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232e4a3a'/%3E%3Cpath d='M10 22c0-7 4-11 12-12-1 8-5 12-12 12Z' fill='%236fa36b'/%3E%3Cpath d='M10 23c2-4 5-7 9-9' stroke='%23f6eddc' stroke-width='2' fill='none'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="masthead">
+        <p class="eyebrow">a small game about what we keep</p>
+        <h1>AFTERBUY<span>: A Little More Life</span></h1>
+      </header>
+
+      <main class="game-frame">
+        <canvas
+          id="game"
+          width="960"
+          height="600"
+          aria-label="Top-down view of a cozy home. Move with WASD or arrow keys and interact with E or Space."
+        ></canvas>
+        <div id="boot" class="boot" role="status">Preparing the room…</div>
+      </main>
+
+      <footer class="controls" aria-label="Controls">
+        <span><b>WASD</b> / <b>Arrows</b> walk</span>
+        <span><b>E</b> / <b>Space</b> interact</span>
+        <span><b>Esc</b> close</span>
+      </footer>
+    </div>
+
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>
